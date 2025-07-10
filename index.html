@@ -11,47 +11,47 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #111827;
+            background-color: #111827; /* bg-gray-900 */
         }
         .panel {
-            background-color: #1f2937;
-            border: 1px solid #374151;
+            background-color: #1f2937; /* bg-gray-800 */
+            border: 1px solid #374151; /* border-gray-700 */
         }
         .input-field {
-            background-color: #374151;
-            border: 1px solid #4b5563;
+            background-color: #374151; /* bg-gray-700 */
+            border: 1px solid #4b5563; /* border-gray-600 */
         }
         .input-field:focus {
             outline: none;
-            border-color: #38bdf8;
+            border-color: #38bdf8; /* border-sky-400 */
             box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3);
         }
         .btn {
             transition: background-color 0.2s, transform 0.1s;
         }
         .btn-primary {
-            background-color: #0ea5e9;
+            background-color: #0ea5e9; /* bg-sky-500 */
             color: white;
         }
         .btn-primary:hover {
-            background-color: #38bdf8;
+            background-color: #38bdf8; /* bg-sky-400 */
         }
         .btn-primary:active {
             transform: scale(0.98);
         }
         .btn-success {
-            background-color: #22c55e;
+            background-color: #22c55e; /* bg-green-500 */
             color: white;
         }
-        .btn-success:hover {
-            background-color: #4ade80;
+         .btn-success:hover {
+            background-color: #4ade80; /* bg-green-400 */
         }
         .btn-danger {
-            background-color: #ef4444;
+            background-color: #ef4444; /* bg-red-500 */
             color: white;
         }
         .btn-danger:hover {
-            background-color: #f87171;
+            background-color: #f87171; /* bg-red-400 */
         }
         .result-value {
             background-color: #111827;
@@ -60,6 +60,7 @@
     </style>
 </head>
 <body class="text-gray-300">
+
     <div class="container mx-auto p-4 sm:p-6 max-w-2xl">
         <header class="text-center mb-8">
             <h1 class="text-3xl sm:text-4xl font-bold text-sky-400">Calculadora de Lay Sequencial</h1>
@@ -68,7 +69,7 @@
 
         <div id="setup-step" class="panel rounded-lg p-6 space-y-4">
             <h2 class="text-xl font-semibold text-white border-b border-gray-700 pb-2">Configuração da Múltipla</h2>
-
+            
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label for="backStake" class="block text-sm font-medium mb-1">Valor da Aposta (R$)</label>
@@ -94,20 +95,12 @@
                     <input type="number" id="commissionRate" class="input-field w-full rounded-md p-2" value="6.5" step="0.1">
                 </div>
             </div>
-            <div>
-                <label for="calcMode" class="block text-sm font-medium mb-1">Modo de Cálculo</label>
-                <select id="calcMode" class="input-field w-full rounded-md p-2">
-                    <option value="standard" selected>Lucro Equilibrado (Standard)</option>
-                    <option value="lockin">Travar Lucro Final (Lock-in)</option>
-                    <option value="freebet">Usando Freebet</option>
-                </select>
-            </div>
             <button id="startBtn" class="btn btn-primary w-full font-bold py-3 mt-4 rounded-md">Iniciar Cálculo Sequencial</button>
         </div>
 
         <div id="leg-step" class="panel rounded-lg p-6 space-y-4 hidden">
             <h2 id="leg-title" class="text-xl font-semibold text-white border-b border-gray-700 pb-2"></h2>
-
+            
             <div>
                 <label for="layOdds" class="block text-sm font-medium mb-1">Odd Lay do Jogo Atual</label>
                 <input type="number" id="layOdds" class="input-field w-full rounded-md p-2" placeholder="Ex: 1.65" step="0.01">
@@ -119,33 +112,177 @@
                     <p id="lay-stake-action" class="text-lg font-semibold text-sky-400"></p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-400">Responsabilidade:</p>
+                    <p class="text-sm text-gray-400">Sua Responsabilidade será de:</p>
                     <p id="lay-liability" class="text-lg font-semibold text-white"></p>
                 </div>
                 <div class="result-value p-3 rounded-md text-center">
-                    <p class="text-sm text-gray-400">Resultado da Perna:</p>
+                    <p class="text-sm text-gray-400">Prejuízo Qualificado Garantido:</p>
                     <p id="qualifying-loss" class="text-2xl font-bold"></p>
                 </div>
             </div>
 
             <div id="leg-outcome" class="pt-4 space-y-2 hidden">
-                <p class="text-center font-semibold">Sua seleção do Jogo <span class="current-leg-number"></span> ganhou?</p>
+                <p class="text-center font-semibold">A sua seleção do Jogo <span class="current-leg-number"></span> ganhou?</p>
                 <div class="flex gap-4">
                     <button id="leg-win-btn" class="btn btn-success w-full py-2 rounded-md font-bold">SIM, GANHOU</button>
-                    <button id="leg-lose-btn" class="btn btn-danger w-full py-2 rounded-md font-bold">NÃO, PERDEU</button>
+                    <button id="leg-lose-btn" class="btn btn-danger w-full py-2 rounded-md font-bold">NÃO, PERDEU / EMPATOU</button>
                 </div>
             </div>
         </div>
 
         <div id="result-step" class="panel rounded-lg p-6 space-y-4 hidden text-center">
-            <h2 id="final-title" class="text-2xl font-bold"></h2>
-            <p id="final-message" class="text-lg"></p>
-            <button id="reset-btn" class="btn btn-primary w-full font-bold py-3 mt-4 rounded-md">Calcular Nova Múltipla</button>
+             <h2 id="final-title" class="text-2xl font-bold"></h2>
+             <p id="final-message" class="text-lg"></p>
+             <button id="reset-btn" class="btn btn-primary w-full font-bold py-3 mt-4 rounded-md">Calcular Nova Múltipla</button>
         </div>
     </div>
 
     <script>
-    // JavaScript completo e funcional será reimplementado aqui logo em seguida
+        document.addEventListener('DOMContentLoaded', () => {
+            // ... (resto do seu código de seleção de elementos permanece o mesmo) ...
+            const setupStep = document.getElementById('setup-step');
+            const legStep = document.getElementById('leg-step');
+            const resultStep = document.getElementById('result-step');
+            
+            const startBtn = document.getElementById('startBtn');
+            const legWinBtn = document.getElementById('leg-win-btn');
+            const legLoseBtn = document.getElementById('leg-lose-btn');
+            const resetBtn = document.getElementById('reset-btn');
+
+            const backStakeInput = document.getElementById('backStake');
+            const backOddsInput = document.getElementById('backOdds');
+            const selectionCountSelect = document.getElementById('selectionCount');
+            const commissionRateInput = document.getElementById('commissionRate');
+            const layOddsInput = document.getElementById('layOdds');
+
+            const legTitle = document.getElementById('leg-title');
+            const legResults = document.getElementById('leg-results');
+            const legOutcome = document.getElementById('leg-outcome');
+            const layStakeAction = document.getElementById('lay-stake-action');
+            const layLiability = document.getElementById('lay-liability');
+            const qualifyingLoss = document.getElementById('qualifying-loss');
+            const finalTitle = document.getElementById('final-title');
+            const finalMessage = document.getElementById('final-message');
+            
+            let state = {};
+
+            function initialize() {
+                state = {
+                    backStake: 0,
+                    backOdds: 0,
+                    selectionCount: 0,
+                    commissionRate: 0,
+                    currentLeg: 1,
+                    accumulatedLiability: 0, 
+                    qualifyingLoss: 0,
+                    potentialReturn: 0
+                };
+                setupStep.classList.remove('hidden');
+                legStep.classList.add('hidden');
+                resultStep.classList.add('hidden');
+                legResults.classList.add('hidden');
+                legOutcome.classList.add('hidden');
+                layOddsInput.value = '';
+            }
+
+            function startCalculation() {
+                state.backStake = parseFloat(backStakeInput.value);
+                state.backOdds = parseFloat(backOddsInput.value);
+                state.selectionCount = parseInt(selectionCountSelect.value);
+                state.commissionRate = parseFloat(commissionRateInput.value) / 100;
+                state.potentialReturn = state.backStake * state.backOdds;
+
+                if (isNaN(state.backStake) || isNaN(state.backOdds) || state.backStake <= 0 || state.backOdds <= 1) {
+                    alert("Por favor, insira valores válidos para a aposta e as odds.");
+                    return;
+                }
+
+                setupStep.classList.add('hidden');
+                legStep.classList.remove('hidden');
+                updateLegUI();
+            }
+
+            function updateLegUI() {
+                legTitle.textContent = `Cálculo da Perna ${state.currentLeg} de ${state.selectionCount}`;
+                document.querySelectorAll('.current-leg-number').forEach(el => el.textContent = state.currentLeg);
+                layOddsInput.value = '';
+                layOddsInput.focus();
+            }
+
+            function calculateLeg() {
+                const layOdds = parseFloat(layOddsInput.value);
+                if (isNaN(layOdds) || layOdds <= 1) {
+                    legResults.classList.add('hidden');
+                    legOutcome.classList.add('hidden');
+                    return;
+                }
+
+                // --- LÓGICA DE CÁLCULO CORRIGIDA E OTIMIZADA ---
+                const currentProfit = state.potentialReturn - state.backStake - state.accumulatedLiability;
+                const layStake = (state.backStake + state.accumulatedLiability) / (layOdds - state.commissionRate);
+                const liability = layStake * (layOdds - 1);
+                
+                const profitIfLayWins = layStake * (1 - state.commissionRate);
+                const overallResult = profitIfLayWins - state.backStake - state.accumulatedLiability;
+                
+                state.qualifyingLoss = overallResult;
+                
+                layStakeAction.textContent = `Faça uma Aposta Lay de R$ ${layStake.toFixed(2)}`;
+                layLiability.textContent = `R$ ${liability.toFixed(2)}`;
+                
+                qualifyingLoss.textContent = `R$ ${overallResult.toFixed(2)}`;
+                if (overallResult < 0) {
+                    qualifyingLoss.classList.remove('text-green-400');
+                    qualifyingLoss.classList.add('text-red-400');
+                    qualifyingLoss.textContent = `-R$ ${Math.abs(overallResult).toFixed(2)}`;
+                } else {
+                    qualifyingLoss.classList.remove('text-red-400');
+                    qualifyingLoss.classList.add('text-green-400');
+                    qualifyingLoss.textContent = `+R$ ${overallResult.toFixed(2)}`;
+                }
+                
+                legResults.classList.remove('hidden');
+                legOutcome.classList.remove('hidden');
+            }
+
+            function handleLegWin() {
+                const layOdds = parseFloat(layOddsInput.value);
+                const layStakeText = layStakeAction.textContent.match(/[\d\.]+/);
+                if (!layStakeText) return;
+                const layStake = parseFloat(layStakeText[0]);
+
+                state.accumulatedLiability += layStake * (layOdds - 1);
+                state.currentLeg++;
+
+                if (state.currentLeg > state.selectionCount) {
+                    const finalProfit = (state.backStake * state.backOdds - state.backStake) - state.accumulatedLiability;
+                    showFinalResult(`Parabéns! Sua múltipla foi vitoriosa.`, `Seu lucro final na operação foi de R$ ${finalProfit.toFixed(2)}.`);
+                } else {
+                    legResults.classList.add('hidden');
+                    legOutcome.classList.add('hidden');
+                    updateLegUI();
+                }
+            }
+
+            function handleLegLose() {
+                showFinalResult(`Operação Concluída!`, `O resultado final da sua operação foi de R$ ${state.qualifyingLoss.toFixed(2)}, como planejado.`);
+            }
+
+            function showFinalResult(title, message) {
+                finalTitle.textContent = title;
+                finalMessage.textContent = message;
+                legStep.classList.add('hidden');
+                resultStep.classList.remove('hidden');
+            }
+
+            startBtn.addEventListener('click', startCalculation);
+            layOddsInput.addEventListener('input', calculateLeg);
+            legWinBtn.addEventListener('click', handleLegWin);
+            legLoseBtn.addEventListener('click', handleLegLose);
+            resetBtn.addEventListener('click', initialize);
+
+            initialize();
+        });
     </script>
 </body>
 </html>
