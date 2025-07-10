@@ -116,7 +116,7 @@
                     <p id="lay-liability" class="text-lg font-semibold text-white"></p>
                 </div>
                 <div class="result-value p-3 rounded-md text-center">
-                    <p class="text-sm text-gray-400">Prejuízo Qualificado Garantido:</p>
+                    <p class="text-sm text-gray-400">Resultado Final Garantido:</p>
                     <p id="qualifying-loss" class="text-2xl font-bold"></p>
                 </div>
             </div>
@@ -217,13 +217,12 @@
                     return;
                 }
 
-                // --- LÓGICA DE CÁLCULO CORRIGIDA E OTIMIZADA ---
-                const currentProfit = state.potentialReturn - state.backStake - state.accumulatedLiability;
-                const layStake = (state.backStake + state.accumulatedLiability) / (layOdds - state.commissionRate);
+                // --- LÓGICA DE CÁLCULO CORRIGIDA ---
+                const layStake = (state.potentialReturn - state.accumulatedLiability) / (layOdds - state.commissionRate);
                 const liability = layStake * (layOdds - 1);
                 
                 const profitIfLayWins = layStake * (1 - state.commissionRate);
-                const overallResult = profitIfLayWins - state.backStake - state.accumulatedLiability;
+                const overallResult = profitIfLayWins - (state.backStake + state.accumulatedLiability);
                 
                 state.qualifyingLoss = overallResult;
                 
@@ -234,7 +233,7 @@
                 if (overallResult < 0) {
                     qualifyingLoss.classList.remove('text-green-400');
                     qualifyingLoss.classList.add('text-red-400');
-                    qualifyingLoss.textContent = `-R$ ${Math.abs(overallResult).toFixed(2)}`;
+                    qualifyingLoss.textContent = `R$ ${overallResult.toFixed(2)}`;
                 } else {
                     qualifyingLoss.classList.remove('text-red-400');
                     qualifyingLoss.classList.add('text-green-400');
@@ -247,7 +246,7 @@
 
             function handleLegWin() {
                 const layOdds = parseFloat(layOddsInput.value);
-                const layStakeText = layStakeAction.textContent.match(/[\d\.]+/);
+                const layStakeText = layStakeAction.textContent.match(/[\d\.-]+/);
                 if (!layStakeText) return;
                 const layStake = parseFloat(layStakeText[0]);
 
