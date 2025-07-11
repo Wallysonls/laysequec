@@ -51,7 +51,6 @@
                         <option value="2">2</option>
                         <option value="3" selected>3</option>
                         <option value="4">4</option>
-                        <option value="5">5</option>
                     </select>
                 </div>
                 <div>
@@ -82,8 +81,8 @@
                     <p id="lay-liability" class="text-lg font-semibold text-white"></p>
                 </div>
                 <div class="result-value p-3 rounded-md text-center">
-                    <p class="text-sm text-gray-400">Prejuízo Qualificado Garantido:</p>
-                    <p id="qualifying-loss" class="text-2xl font-bold text-red-400"></p>
+                    <p class="text-sm text-gray-400">Resultado Final Garantido:</p>
+                    <p id="qualifying-loss" class="text-2xl font-bold"></p>
                 </div>
             </div>
             <div id="leg-outcome" class="pt-4 space-y-2 hidden">
@@ -135,17 +134,15 @@
                     selectionCount: 0,
                     commission: 0,
                     currentLeg: 1,
-                    accumulatedLayLiability: 0,
-                    // Corrigido: O estado agora armazena o lucro potencial da casa de apostas
-                    bookieProfitIfWin: 0 
+                    // Corrigido: o estado agora armazena o retorno potencial da casa de apostas
+                    bookieReturn: 0,
+                    // Corrigido: o estado armazena o lucro/prejuizo acumulado da Betfair
+                    exchangeProfitLoss: 0, 
+                    lastCalculatedResult: 0
                 };
                 setupStep.classList.remove('hidden');
                 legStep.classList.add('hidden');
                 resultStep.classList.add('hidden');
-                legResults.classList.add('hidden');
-                legOutcome.classList.add('hidden');
-                layOddsInput.value = '';
-                legBackOddsInput.value = '';
             }
 
             function startCalculation() {
@@ -153,9 +150,7 @@
                 state.backOdds = parseFloat(backOddsInput.value);
                 state.selectionCount = parseInt(selectionCountSelect.value);
                 state.commission = parseFloat(commissionRateInput.value) / 100;
-                
-                // O lucro potencial se a múltipla inteira ganhar
-                state.bookieProfitIfWin = state.backStake * state.backOdds - state.backStake;
+                state.bookieReturn = state.backStake * state.backOdds;
 
                 if (isNaN(state.backStake) || isNaN(state.backOdds) || state.backStake <= 0 || state.backOdds <= 1) {
                     alert("Por favor, insira valores válidos para a aposta e as odds.");
@@ -172,6 +167,8 @@
                 document.querySelectorAll('.current-leg-number').forEach(el => el.textContent = state.currentLeg);
                 layOddsInput.value = '';
                 legBackOddsInput.value = '';
+                legResults.classList.add('hidden');
+                legOutcome.classList.add('hidden');
                 layOddsInput.focus();
             }
 
@@ -186,16 +183,20 @@
                 }
                 
                 // --- LÓGICA DE CÁLCULO FINAL E CORRIGIDA ---
-                const layStake = (state.bookieProfitIfWin - state.accumulatedLayLiability) / (layOdds - 1);
+                const layStake = (state.bookieReturn + state.exchangeProfitLoss) / (layOdds - state.commission);
                 const liability = layStake * (layOdds - 1);
                 
-                const finalOutcome = (layStake * (1 - state.commission)) - (state.accumulatedLayLiability + state.backStake);
-
+                const profitIfLayWins = layStake * (1 - state.commission);
+                const overallResult = state.exchangeProfitLoss + profitIfLayWins - state.backStake;
+                
+                state.lastCalculatedResult = overallResult;
+                
                 layStakeAction.textContent = `Faça uma Aposta Lay de R$ ${layStake.toFixed(2)}`;
                 layLiability.textContent = `R$ ${liability.toFixed(2)}`;
-                qualifyingLoss.textContent = `R$ ${finalOutcome.toFixed(2)}`;
-                qualifyingLoss.className = `text-2xl font-bold ${finalOutcome >= 0 ? 'text-green-400' : 'text-red-400'}`;
-
+                
+                qualifyingLoss.textContent = `R$ ${overallResult.toFixed(2)}`;
+                qualifyingLoss.className = `text-2xl font-bold ${overallResult >= 0 ? 'text-green-400' : 'text-red-400'}`;
+                
                 legResults.classList.remove('hidden');
                 legOutcome.classList.remove('hidden');
             }
@@ -206,25 +207,19 @@
                 if (!layStakeText) return;
                 const layStake = parseFloat(layStakeText[0]);
 
-                state.accumulatedLayLiability += layStake * (layOdds - 1);
+                state.exchangeProfitLoss -= layStake * (layOdds - 1);
                 state.currentLeg++;
 
                 if (state.currentLeg > state.selectionCount) {
-                    const finalProfit = state.bookieProfitIfWin - state.accumulatedLayLiability;
+                    const finalProfit = (state.bookieReturn - state.backStake) + state.exchangeProfitLoss;
                     showFinalResult(`Parabéns! Sua múltipla foi vitoriosa.`, `Seu resultado final na operação foi de R$ ${finalProfit.toFixed(2)}.`);
                 } else {
-                    legResults.classList.add('hidden');
-                    legOutcome.classList.add('hidden');
                     updateLegUI();
                 }
             }
 
             function handleLegLose() {
-                const layStakeText = layStakeAction.textContent.match(/[\d\.-]+/);
-                 if (!layStakeText) return;
-                const layStake = parseFloat(layStakeText[0]);
-                const finalOutcome = (layStake * (1 - state.commission)) - (state.backStake + state.accumulatedLiability);
-                showFinalResult(`Operação Concluída!`, `O resultado final da sua operação foi de R$ ${finalOutcome.toFixed(2)}, como planejado.`);
+                showFinalResult(`Operação Concluída!`, `O resultado final da sua operação foi de R$ ${state.lastCalculatedResult.toFixed(2)}, como planejado.`);
             }
 
             function showFinalResult(title, message) {
@@ -234,9 +229,10 @@
                 resultStep.classList.remove('hidden');
             }
 
+            const inputsToCalculate = [layOddsInput, legBackOddsInput];
+            inputsToCalculate.forEach(input => input.addEventListener('input', calculateLeg));
+
             startBtn.addEventListener('click', startCalculation);
-            layOddsInput.addEventListener('input', calculateLeg);
-            legBackOddsInput.addEventListener('input', calculateLeg);
             legWinBtn.addEventListener('click', handleLegWin);
             legLoseBtn.addEventListener('click', handleLegLose);
             resetBtn.addEventListener('click', initialize);
