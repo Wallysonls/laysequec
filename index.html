@@ -1,280 +1,150 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Calculadora de Lay Sequencial PRO</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-    body {
-        font-family: 'Inter', sans-serif;
-        background-color: #111827;
-        color: #d1d5db;
-    }
-    .panel {
-        background-color: #1f2937;
-        border: 1px solid #374151;
-    }
-    .input-field {
-        background-color: #374151;
-        border: 1px solid #4b5563;
-        color: white;
-    }
-    .input-field:focus {
-        outline: none;
-        border-color: #38bdf8;
-        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3);
-    }
-    .btn {
-        transition: background-color 0.2s;
-        border-radius: 0.375rem;
-        padding: 0.75rem 0;
-        font-weight: 700;
-        cursor: pointer;
-    }
-    .btn-primary {
-        background-color: #0ea5e9;
-        color: white;
-    }
-    .btn-primary:hover {
-        background-color: #38bdf8;
-    }
-    .btn-success {
-        background-color: #22c55e;
-        color: white;
-    }
-    .btn-danger {
-        background-color: #ef4444;
-        color: white;
-    }
-    pre {
-        white-space: pre-wrap;
-        text-align: left;
-        padding: 1rem;
-        background-color: #111827;
-        border: 1px dashed #4b5563;
-        border-radius: 0.5rem;
-        margin-top: 0.5rem;
-        color: #cbd5e1;
-        font-size: 0.9rem;
-    }
-    table {
-        width: 100%;
-        margin-top: 1rem;
-        border-collapse: collapse;
-        color: #d1d5db;
-    }
-    th, td {
-        border: 1px solid #4b5563;
-        padding: 0.5rem;
-        text-align: center;
-    }
-    th {
-        background-color: #374151;
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Lay Sequencial PRO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: sans-serif; background-color: #111827; color: #d1d5db; }
+        .panel { background-color: #1f2937; border: 1px solid #374151; }
+        .input-field { background-color: #374151; border: 1px solid #4b5563; color: white; }
+        .input-field:focus { outline: none; border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3); }
+        .btn { transition: background-color 0.2s; border-radius: 0.375rem; padding: 0.75rem 0; font-weight: 700; }
+        .btn-primary { background-color: #0ea5e9; color: white; }
+        .btn-primary:hover { background-color: #38bdf8; }
+        .btn-success { background-color: #22c55e; color: white; }
+        .btn-danger { background-color: #ef4444; color: white; }
+    </style>
 </head>
 <body>
 <div class="container mx-auto p-4 max-w-2xl">
-    <h1 class="text-3xl font-bold text-sky-400 mb-6 text-center">Calculadora de Lay Sequencial PRO</h1>
+    <h1 class="text-3xl font-bold text-sky-400 mb-4 text-center">Calculadora de Lay Sequencial PRO</h1>
 
-    <div class="panel p-6 rounded space-y-6">
+    <div class="panel p-4 rounded space-y-4">
         <div>
-            <label class="block mb-1 font-semibold">Aposta Inicial (R$)</label>
-            <input type="number" id="backStake" class="input-field w-full p-2" value="50" step="0.01" min="0.01" />
+            <label>Aposta Inicial (R$)</label>
+            <input type="number" id="backStake" class="input-field w-full" value="50" step="0.01">
         </div>
         <div>
-            <label class="block mb-1 font-semibold">Comissão da Bolsa (%)</label>
-            <input type="number" id="commission" class="input-field w-full p-2" value="6.5" step="0.1" min="0" max="100" />
+            <label>Comissão da Bolsa (%)</label>
+            <input type="number" id="commission" class="input-field w-full" value="6.5" step="0.1">
         </div>
         <div>
-            <label class="block mb-1 font-semibold">Odds Back das Seleções (separadas por vírgula)</label>
-            <input type="text" id="backOdds" class="input-field w-full p-2" placeholder="Ex: 1.80, 1.65, 1.90" />
+            <label>Odds Back das Seleções (separadas por vírgula)</label>
+            <input type="text" id="backOdds" class="input-field w-full" placeholder="Ex: 1.80, 1.65, 1.90">
         </div>
-
-        <div id="lay-section" class="hidden space-y-4 mt-4">
-            <label class="block mb-1 font-semibold">Odd Lay da Seleção Atual</label>
-            <input type="number" id="layOdds" class="input-field w-full p-2" step="0.01" min="1.01" />
-            <button class="btn btn-primary w-full" id="calcularLay">Calcular Lay</button>
-
-            <pre id="lay-info" class="hidden"></pre>
-
-            <div class="flex justify-center gap-4 mt-2">
-                <button class="btn btn-success" id="continuar" disabled>Próxima Seleção</button>
-                <button class="btn btn-danger" id="encerrar" disabled>Encerrar Lay</button>
+        <div id="lay-section" class="hidden space-y-4">
+            <label>Odd Lay da Seleção Atual</label>
+            <input type="number" id="layOdds" class="input-field w-full" step="0.01">
+            <button class="btn-primary w-full" id="calcularLay">Calcular Lay</button>
+            <div class="text-center">
+                <p id="lay-stake"></p>
+                <p id="lay-liability"></p>
+                <p id="lay-outcome"></p>
+                <div class="flex justify-center gap-4 mt-2">
+                    <button class="btn-success" id="continuar">Próxima Seleção</button>
+                    <button class="btn-danger" id="encerrar">Encerrar Lay</button>
+                </div>
             </div>
         </div>
-
-        <button class="btn btn-primary w-full mt-4" id="iniciar">Iniciar Cálculo</button>
-
-        <div id="resultado-final" class="text-center mt-6 text-lg font-semibold"></div>
+        <button class="btn-primary w-full" id="iniciar">Iniciar Cálculo</button>
+        <div id="resultado-final" class="text-center mt-4 font-bold"></div>
     </div>
 </div>
 
 <script>
-    const formatarValor = (valor) => {
-        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    };
+const formatarValor = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-    let state = {
-        stake: 0,
-        comissao: 0,
-        backOdds: [],
-        atualIndex: 0,
-        oddMultiplaFinal: 1,
-        valorAtual: 0,
-        lucroEsperado: 0,
-        responsabilidadeAcumulada: 0,
-        layStakeAtual: 0,
-        liabilityAtual: 0,
-    };
+let state = {
+    stake: 0,
+    comissao: 0,
+    backOdds: [],
+    atualIndex: 0,
+    valorAtual: 0,
+    lucroEsperado: 0,
+    layTotalResponsabilidade: 0,
+    layStakeAtual: 0,
+    protecoes: []
+};
 
-    const backStakeInput = document.getElementById('backStake');
-    const commissionInput = document.getElementById('commission');
-    const backOddsInput = document.getElementById('backOdds');
-    const layOddsInput = document.getElementById('layOdds');
-    const resultadoFinalDiv = document.getElementById('resultado-final');
-    const laySection = document.getElementById('lay-section');
-    const layInfo = document.getElementById('lay-info');
-    const btnCalcularLay = document.getElementById('calcularLay');
-    const btnContinuar = document.getElementById('continuar');
-    const btnEncerrar = document.getElementById('encerrar');
-    const btnIniciar = document.getElementById('iniciar');
+const backStakeInput = document.getElementById('backStake');
+const commissionInput = document.getElementById('commission');
+const backOddsInput = document.getElementById('backOdds');
+const layOddsInput = document.getElementById('layOdds');
+const resultadoFinalDiv = document.getElementById('resultado-final');
 
-    btnIniciar.onclick = () => {
-        state.stake = parseFloat(backStakeInput.value);
-        state.comissao = parseFloat(commissionInput.value) / 100;
-        state.backOdds = backOddsInput.value.split(',').map(o => parseFloat(o.trim())).filter(o => o > 1);
+const protegerPorcentagens = [0.3, 0.3, 0.4]; // Total 100%
 
-        if (state.backOdds.length === 0 || isNaN(state.stake) || isNaN(state.comissao) || state.stake <= 0) {
-            alert('Preencha todos os campos corretamente com valores válidos.');
-            return;
-        }
+document.getElementById('iniciar').onclick = () => {
+    state.stake = parseFloat(backStakeInput.value);
+    state.comissao = parseFloat(commissionInput.value) / 100;
+    state.backOdds = backOddsInput.value.split(',').map(o => parseFloat(o.trim())).filter(o => o > 1);
 
-        state.atualIndex = 0;
-        state.valorAtual = state.stake;
-        state.oddMultiplaFinal = state.backOdds.reduce((acc, val) => acc * val, 1);
-        state.lucroEsperado = state.stake * (state.oddMultiplaFinal - 1);
-        state.responsabilidadeAcumulada = 0;
-
-        resultadoFinalDiv.textContent = '';
-        layInfo.textContent = '';
-        layInfo.classList.add('hidden');
-
-        laySection.classList.remove('hidden');
-        btnContinuar.disabled = true;
-        btnEncerrar.disabled = true;
-        layOddsInput.value = '';
-        layOddsInput.focus();
-        atualizarLayUI();
-    };
-
-    function atualizarLayUI() {
-        const pernaAtual = state.atualIndex + 1;
-        layInfo.textContent = `Perna ${pernaAtual} de ${state.backOdds.length}\n`;
-        layOddsInput.value = '';
-        layOddsInput.focus();
-        btnContinuar.disabled = true;
-        btnEncerrar.disabled = true;
-        resultadoFinalDiv.textContent = '';
-        layInfo.classList.add('hidden');
+    if (state.backOdds.length === 0 || isNaN(state.stake) || isNaN(state.comissao)) {
+        alert("Preencha todos os campos corretamente.");
+        return;
     }
 
-    btnCalcularLay.onclick = () => {
-        const layOdds = parseFloat(layOddsInput.value);
-        if (isNaN(layOdds) || layOdds <= 1) {
-            alert('Por favor, insira uma Odd Lay válida maior que 1.');
-            return;
-        }
+    state.atualIndex = 0;
+    state.valorAtual = state.stake;
+    const oddMultiplaFinal = state.backOdds.reduce((acc, val) => acc * val, 1);
+    state.lucroEsperado = state.stake * (oddMultiplaFinal - 1);
+    state.layTotalResponsabilidade = 0;
+    state.protecoes = protegerPorcentagens.slice(0, state.backOdds.length);
 
-        const valorProtegido = state.lucroEsperado - state.responsabilidadeAcumulada;
+    document.getElementById('lay-section').classList.remove('hidden');
+    updateLayUI();
+};
 
-        const layStake = valorProtegido / (layOdds - state.comissao);
-        const liability = layStake * (layOdds - 1);
+function updateLayUI() {
+    document.getElementById('lay-stake').textContent = '';
+    document.getElementById('lay-liability').textContent = '';
+    document.getElementById('lay-outcome').textContent = `Seleção ${state.atualIndex + 1} de ${state.backOdds.length}`;
+    layOddsInput.value = '';
+    resultadoFinalDiv.textContent = '';
+}
 
-        state.layStakeAtual = layStake;
-        state.liabilityAtual = liability;
+document.getElementById('calcularLay').onclick = () => {
+    const layOdds = parseFloat(layOddsInput.value);
+    if (isNaN(layOdds) || layOdds <= 1) {
+        alert("Odd Lay inválida.");
+        return;
+    }
 
-        const lucroLay = layStake * (1 - state.comissao);
-        const resultadoGarantido = lucroLay - valorProtegido;
+    const protegerValor = state.lucroEsperado * state.protecoes[state.atualIndex];
+    const layStake = protegerValor / (layOdds - state.comissao);
+    const liability = layStake * (layOdds - 1);
+    const resultado = layStake * (1 - state.comissao) - state.valorAtual;
 
-        let texto = `Lay Stake: ${formatarValor(layStake)}\n`;
-        texto += `Responsabilidade: ${formatarValor(liability)}\n`;
-        texto += `Lucro garantido se a múltipla quebrar nesta perna: ${formatarValor(resultadoGarantido)}\n`;
-        texto += `Valor a proteger (lucro esperado - responsabilidades pagas): ${formatarValor(valorProtegido)}\n`;
+    state.layStakeAtual = layStake;
+    state.layTotalResponsabilidade += liability;
 
-        layInfo.textContent = texto;
-        layInfo.classList.remove('hidden');
+    document.getElementById('lay-stake').textContent = `Lay Stake: ${formatarValor(layStake)}`;
+    document.getElementById('lay-liability').textContent = `Responsabilidade: ${formatarValor(liability)}`;
+    document.getElementById('lay-outcome').textContent += `\nLucro se a múltipla quebrar agora: ${formatarValor(resultado)}`;
+};
 
-        btnContinuar.disabled = false;
-        btnEncerrar.disabled = false;
-    };
+document.getElementById('continuar').onclick = () => {
+    state.valorAtual *= state.backOdds[state.atualIndex];
+    state.atualIndex++;
 
-    btnContinuar.onclick = () => {
-        state.valorAtual *= state.backOdds[state.atualIndex];
-        state.responsabilidadeAcumulada += state.liabilityAtual;
+    if (state.atualIndex >= state.backOdds.length) {
+        const lucroFinal = state.valorAtual - state.stake - state.layTotalResponsabilidade;
+        resultadoFinalDiv.textContent = `✅ Múltipla completa! Lucro final: ${formatarValor(lucroFinal)}`;
+        document.getElementById('lay-section').classList.add('hidden');
+    } else {
+        updateLayUI();
+    }
+};
 
-        state.atualIndex++;
-
-        if (state.atualIndex >= state.backOdds.length) {
-            const lucroLiquido = state.valorAtual - state.stake - state.responsabilidadeAcumulada;
-            resultadoFinalDiv.innerHTML = `
-                ✅ Múltipla completa!<br />
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Investimento Total</th>
-                            <th>Retorno Bruto da Múltipla</th>
-                            <th>Responsabilidade Acumulada (Lays)</th>
-                            <th>Lucro Líquido</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>${formatarValor(state.stake + state.responsabilidadeAcumulada)}</td>
-                            <td>${formatarValor(state.valorAtual)}</td>
-                            <td>${formatarValor(state.responsabilidadeAcumulada)}</td>
-                            <td style="color: ${lucroLiquido >= 0 ? '#22c55e' : '#ef4444'};">${formatarValor(lucroLiquido)}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            `;
-            laySection.classList.add('hidden');
-        } else {
-            atualizarLayUI();
-        }
-    };
-
-    btnEncerrar.onclick = () => {
-        const retornoLay = state.layStakeAtual * (1 - state.comissao);
-
-        // Inclui responsabilidadeAtual aqui no investimento total
-        const investimentoTotal = state.stake + state.responsabilidadeAcumulada + state.liabilityAtual;
-
-        const lucroLiquido = retornoLay + state.valorAtual - investimentoTotal;
-
-        resultadoFinalDiv.innerHTML = `
-            ❌ Múltipla quebrou (lay acionado).<br />
-            <table>
-                <thead>
-                    <tr>
-                        <th>Investimento Total</th>
-                        <th>Retorno na Lay + Valor Acumulado</th>
-                        <th>Lucro Líquido</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>${formatarValor(investimentoTotal)}</td>
-                        <td>${formatarValor(retornoLay + state.valorAtual)}</td>
-                        <td style="color: ${lucroLiquido >= 0 ? '#22c55e' : '#ef4444'};">${formatarValor(lucroLiquido)}</td>
-                    </tr>
-                </tbody>
-            </table>
-        `;
-
-        laySection.classList.add('hidden');
-    };
+document.getElementById('encerrar').onclick = () => {
+    const retornoLay = state.layStakeAtual * (1 - state.comissao);
+    const investimentoTotal = state.stake + state.layTotalResponsabilidade;
+    const lucroLiquido = retornoLay + state.valorAtual - investimentoTotal;
+    resultadoFinalDiv.textContent = `❌ Múltipla protegida. Lucro líquido: ${formatarValor(lucroLiquido)}`;
+    document.getElementById('lay-section').classList.add('hidden');
+};
 </script>
 </body>
 </html>
