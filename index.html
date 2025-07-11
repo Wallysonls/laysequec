@@ -263,7 +263,7 @@
 
         switch (mode) {
           case 'standard':
-            layStake = (potentialReturn - accLiability) / (layOdds - commission);
+            layStake = (potentialReturn - accLiability) / (layOdds - 1);
             liability = layStake * (layOdds - 1);
             const lucroLay = layStake * (1 - commission);
             resultadoFinal = lucroLay - (backStake + accLiability);
@@ -271,14 +271,14 @@
 
           case 'lockin':
             const lucroBack = (backOdds - 1) * backStake;
-            layStake = (backStake + accLiability + lucroBack) / (layOdds - commission);
+            layStake = (backStake + accLiability + lucroBack) / (layOdds - 1);
             liability = layStake * (layOdds - 1);
             resultadoFinal = lucroBack - liability - accLiability;
             break;
 
           case 'freebet':
             const lucroPotencial = backStake * (backOdds - 1);
-            layStake = lucroPotencial / (layOdds - commission);
+            layStake = lucroPotencial / (layOdds - 1);
             liability = layStake * (layOdds - 1);
             resultadoFinal = layStake * (1 - commission) - accLiability;
             break;
