@@ -1,243 +1,295 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Lay Sequencial (Versão Final e Corrigida)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #111827; color: #d1d5db; }
-        .panel { background-color: #1f2937; border: 1px solid #374151; }
-        .input-field { background-color: #374151; border: 1px solid #4b5563; color: white; }
-        .input-field:focus { outline: none; border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3); }
-        .btn { transition: background-color 0.2s, transform 0.1s; border-radius: 0.375rem; padding: 0.75rem 0; font-weight: 700; }
-        .btn-primary { background-color: #0ea5e9; color: white; }
-        .btn-primary:hover { background-color: #38bdf8; }
-        .btn-success { background-color: #22c55e; color: white; }
-        .btn-danger { background-color: #ef4444; color: white; }
-        .result-value { background-color: #111827; border: 1px dashed #4b5563; }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Calculadora de Lay Sequencial PRO</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #111827;
+        color: #d1d5db;
+    }
+    .panel {
+        background-color: #1f2937;
+        border: 1px solid #374151;
+    }
+    .input-field {
+        background-color: #374151;
+        border: 1px solid #4b5563;
+        color: white;
+    }
+    .input-field:focus {
+        outline: none;
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3);
+    }
+    .btn {
+        transition: background-color 0.2s;
+        border-radius: 0.375rem;
+        padding: 0.75rem 0;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .btn-primary {
+        background-color: #0ea5e9;
+        color: white;
+    }
+    .btn-primary:hover {
+        background-color: #38bdf8;
+    }
+    .btn-success {
+        background-color: #22c55e;
+        color: white;
+    }
+    .btn-danger {
+        background-color: #ef4444;
+        color: white;
+    }
+    pre {
+        white-space: pre-wrap;
+        text-align: left;
+        padding: 1rem;
+        background-color: #111827;
+        border: 1px dashed #4b5563;
+        border-radius: 0.5rem;
+        margin-top: 0.5rem;
+        color: #cbd5e1;
+        font-size: 0.9rem;
+    }
+    table {
+        width: 100%;
+        margin-top: 1rem;
+        border-collapse: collapse;
+        color: #d1d5db;
+    }
+    th, td {
+        border: 1px solid #4b5563;
+        padding: 0.5rem;
+        text-align: center;
+    }
+    th {
+        background-color: #374151;
+    }
+</style>
 </head>
-<body class="antialiased">
+<body>
+<div class="container mx-auto p-4 max-w-2xl">
+    <h1 class="text-3xl font-bold text-sky-400 mb-6 text-center">Calculadora de Lay Sequencial PRO</h1>
 
-    <div class="container mx-auto p-4 sm:p-6 max-w-2xl">
-        <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-bold text-sky-400">Calculadora de Lay Sequencial</h1>
-            <p class="text-gray-400 mt-2">Versão com Lógica Definitiva e Precisa</p>
-        </header>
-
-        <div id="setup-step" class="panel rounded-lg p-6 space-y-4">
-            <h2 class="text-xl font-semibold text-white border-b border-gray-700 pb-2">1. Configuração da Múltipla</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label for="backStake" class="block text-sm font-medium mb-1">Valor da Aposta (R$)</label>
-                    <input type="number" id="backStake" class="input-field w-full" value="50" step="0.01">
-                </div>
-                <div>
-                    <label for="commissionRate" class="block text-sm font-medium mb-1">Comissão da Bolsa (%)</label>
-                    <input type="number" id="commissionRate" class="input-field w-full" value="6.5" step="0.1">
-                </div>
-            </div>
-             <div id="legs-container" class="space-y-3 pt-4">
-                <label class="block text-lg font-medium mb-2 text-white">2. Odds Back de Cada Seleção</label>
-            </div>
-            <button id="add-leg-btn" class="bg-gray-600 hover:bg-gray-500 text-white w-full py-2 rounded-md mt-2">Adicionar Seleção</button>
-            <button id="startBtn" class="btn btn-primary w-full mt-4">Iniciar Cálculo</button>
+    <div class="panel p-6 rounded space-y-6">
+        <div>
+            <label class="block mb-1 font-semibold">Aposta Inicial (R$)</label>
+            <input type="number" id="backStake" class="input-field w-full p-2" value="50" step="0.01" min="0.01" />
+        </div>
+        <div>
+            <label class="block mb-1 font-semibold">Comissão da Bolsa (%)</label>
+            <input type="number" id="commission" class="input-field w-full p-2" value="6.5" step="0.1" min="0" max="100" />
+        </div>
+        <div>
+            <label class="block mb-1 font-semibold">Odds Back das Seleções (separadas por vírgula)</label>
+            <input type="text" id="backOdds" class="input-field w-full p-2" placeholder="Ex: 1.80, 1.65, 1.90" />
         </div>
 
-        <div id="leg-step" class="panel rounded-lg p-6 space-y-4 hidden">
-            <h2 id="leg-title" class="text-xl font-semibold text-white"></h2>
-            <div>
-                <label for="layOdds" class="block text-sm font-medium mb-1">Odd Lay da Seleção Atual</label>
-                <input type="number" id="layOdds" class="input-field w-full" step="0.01">
-            </div>
-            <div id="leg-results" class="space-y-3 pt-2 hidden">
-                <p id="lay-stake-action" class="text-lg font-semibold text-sky-400"></p>
-                <p id="lay-liability" class="text-lg font-semibold text-white"></p>
-                <div style="background-color: #111827; border: 1px dashed #4b5563;" class="p-3 rounded-md text-center">
-                    <p class="text-sm text-gray-400">Resultado Final Garantido (Lucro / Prejuízo)</p>
-                    <p id="final-outcome" class="text-2xl font-bold"></p>
-                </div>
-            </div>
-            <div id="leg-outcome" class="pt-4 space-y-2 hidden">
-                <p class="text-center font-semibold">A seleção do Jogo <span class="current-leg-number"></span> ganhou?</p>
-                <div class="flex gap-4">
-                    <button id="leg-win-btn" class="btn-success w-full">SIM</button>
-                    <button id="leg-lose-btn" class="btn-danger w-full">NÃO</button>
-                </div>
+        <div id="lay-section" class="hidden space-y-4 mt-4">
+            <label class="block mb-1 font-semibold">Odd Lay da Seleção Atual</label>
+            <input type="number" id="layOdds" class="input-field w-full p-2" step="0.01" min="1.01" />
+            <button class="btn btn-primary w-full" id="calcularLay">Calcular Lay</button>
+
+            <pre id="lay-info" class="hidden"></pre>
+
+            <div class="flex justify-center gap-4 mt-2">
+                <button class="btn btn-success" id="continuar" disabled>Próxima Seleção</button>
+                <button class="btn btn-danger" id="encerrar" disabled>Encerrar Lay</button>
             </div>
         </div>
 
-        <div id="result-step" class="panel rounded-lg p-6 space-y-4 hidden text-center">
-             <h2 id="final-title" class="text-2xl font-bold"></h2>
-             <p id="final-message" class="text-lg"></p>
-             <button id="reset-btn" class="btn-primary w-full mt-4">Recomeçar</button>
-        </div>
+        <button class="btn btn-primary w-full mt-4" id="iniciar">Iniciar Cálculo</button>
+
+        <div id="resultado-final" class="text-center mt-6 text-lg font-semibold"></div>
     </div>
+</div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const setupStep = document.getElementById('setup-step');
-            const legStep = document.getElementById('leg-step');
-            const resultStep = document.getElementById('result-step');
-            const startBtn = document.getElementById('startBtn');
-            const addLegBtn = document.getElementById('add-leg-btn');
-            const legWinBtn = document.getElementById('leg-win-btn');
-            const legLoseBtn = document.getElementById('leg-lose-btn');
-            const resetBtn = document.getElementById('reset-btn');
-            const backStakeInput = document.getElementById('backStake');
-            const commissionRateInput = document.getElementById('commissionRate');
-            const legsContainer = document.getElementById('legs-container');
-            const layOddsInput = document.getElementById('layOdds');
-            const legTitle = document.getElementById('leg-title');
-            const legResults = document.getElementById('leg-results');
-            const legOutcome = document.getElementById('leg-outcome');
-            const layStakeAction = document.getElementById('lay-stake-action');
-            const layLiability = document.getElementById('lay-liability');
-            const finalOutcomeDisplay = document.getElementById('final-outcome');
-            const finalTitle = document.getElementById('final-title');
-            const finalMessage = document.getElementById('final-message');
-            
-            let state = {};
+<script>
+    const formatarValor = (valor) => {
+        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    };
 
-            function addLeg(isInitial = false) {
-                const legNumber = legsContainer.children.length;
-                const legDiv = document.createElement('div');
-                legDiv.innerHTML = `<label class="block text-sm font-medium mb-1">Odd Back da Seleção ${legNumber + 1}</label><input type="number" class="leg-back-odds input-field w-full p-2" step="0.01">`;
-                legsContainer.appendChild(legDiv);
-            }
+    let state = {
+        stake: 0,
+        comissao: 0,
+        backOdds: [],
+        atualIndex: 0,
+        oddMultiplaFinal: 1,
+        valorAtual: 0,
+        lucroEsperado: 0,
+        responsabilidadeAcumulada: 0,
+        layStakeAtual: 0,
+        liabilityAtual: 0,
+    };
 
-            function initialize() {
-                state = {
-                    backStake: 0,
-                    commission: 0,
-                    legs: [], // Array to hold back odds of each leg
-                    currentLegIndex: 0,
-                    // Este valor agora representa o valor atual da aposta na casa
-                    currentBookieValue: 0, 
-                    lastCalculatedResult: 0
-                };
-                legsContainer.innerHTML = '';
-                addLeg();
-                addLeg();
-                setupStep.classList.remove('hidden');
-                legStep.classList.add('hidden');
-                resultStep.classList.add('hidden');
-            }
+    const backStakeInput = document.getElementById('backStake');
+    const commissionInput = document.getElementById('commission');
+    const backOddsInput = document.getElementById('backOdds');
+    const layOddsInput = document.getElementById('layOdds');
+    const resultadoFinalDiv = document.getElementById('resultado-final');
+    const laySection = document.getElementById('lay-section');
+    const layInfo = document.getElementById('lay-info');
+    const btnCalcularLay = document.getElementById('calcularLay');
+    const btnContinuar = document.getElementById('continuar');
+    const btnEncerrar = document.getElementById('encerrar');
+    const btnIniciar = document.getElementById('iniciar');
 
-            function startCalculation() {
-                state.backStake = parseFloat(backStakeInput.value);
-                state.commission = parseFloat(commissionRateInput.value) / 100;
-                const legOddsInputs = document.querySelectorAll('.leg-back-odds');
-                state.legs = Array.from(legOddsInputs).map(input => parseFloat(input.value)).filter(val => !isNaN(val) && val > 1);
+    btnIniciar.onclick = () => {
+        // Resetar estado
+        state.stake = parseFloat(backStakeInput.value);
+        state.comissao = parseFloat(commissionInput.value) / 100;
+        state.backOdds = backOddsInput.value.split(',').map(o => parseFloat(o.trim())).filter(o => o > 1);
 
-                if (state.legs.length < 1 || isNaN(state.backStake) || state.backStake <= 0) {
-                    alert("Por favor, preencha pelo menos uma perna com odd válida e um valor de aposta.");
-                    return;
-                }
-                
-                state.currentBookieValue = state.backStake;
-                state.currentLegIndex = 0;
+        if (state.backOdds.length === 0 || isNaN(state.stake) || isNaN(state.comissao) || state.stake <= 0) {
+            alert('Preencha todos os campos corretamente com valores válidos.');
+            return;
+        }
 
-                setupStep.classList.add('hidden');
-                legStep.classList.remove('hidden');
-                updateLegUI();
-            }
+        state.atualIndex = 0;
+        state.valorAtual = state.stake;
+        state.oddMultiplaFinal = state.backOdds.reduce((acc, val) => acc * val, 1);
+        state.lucroEsperado = state.stake * (state.oddMultiplaFinal - 1);
+        state.responsabilidadeAcumulada = 0;
 
-            function updateLegUI() {
-                const legNumber = state.currentLegIndex + 1;
-                legTitle.textContent = `Cálculo da Perna ${legNumber} de ${state.legs.length}`;
-                document.querySelectorAll('.current-leg-number').forEach(el => el.textContent = legNumber);
-                layOddsInput.value = '';
-                legResults.classList.add('hidden');
-                legOutcome.classList.add('hidden');
-                layOddsInput.focus();
-            }
+        resultadoFinalDiv.textContent = '';
+        layInfo.textContent = '';
+        layInfo.classList.add('hidden');
 
-            function calculateLeg() {
-                const layOddsValue = layOddsInput.value;
-                if (layOddsValue === '' || layOddsValue === null) {
-                    legResults.classList.add('hidden');
-                    legOutcome.classList.add('hidden');
-                    return;
-                }
+        laySection.classList.remove('hidden');
+        btnContinuar.disabled = true;
+        btnEncerrar.disabled = true;
+        layOddsInput.value = '';
+        layOddsInput.focus();
+        atualizarLayUI();
+    };
 
-                const layOdds = parseFloat(layOddsValue);
+    function atualizarLayUI() {
+        const pernaAtual = state.atualIndex + 1;
+        layInfo.textContent = `Perna ${pernaAtual} de ${state.backOdds.length}\n`;
+        layOddsInput.value = '';
+        layOddsInput.focus();
+        btnContinuar.disabled = true;
+        btnEncerrar.disabled = true;
+        resultadoFinalDiv.textContent = '';
+        layInfo.classList.add('hidden');
+    }
 
-                // --- LÓGICA DE VALIDAÇÃO MELHORADA ---
-                if (isNaN(layOdds) || layOdds <= 1) {
-                    legResults.classList.add('hidden');
-                    legOutcome.classList.add('hidden');
-                    
-                    clearTimeout(window.layOddErrorTimeout);
-                    window.layOddErrorTimeout = setTimeout(() => {
-                        const currentVal = parseFloat(layOddsInput.value);
-                        if (currentVal <= 1 && !isNaN(currentVal)) {
-                            alert("Erro: A Odd Lay deve ser sempre maior que 1.00. Por favor, insira um valor válido (ex: 1.01 ou mais).");
-                        }
-                    }, 500);
-                    return;
-                }
-                
-                clearTimeout(window.layOddErrorTimeout);
+    btnCalcularLay.onclick = () => {
+        const layOdds = parseFloat(layOddsInput.value);
+        if (isNaN(layOdds) || layOdds <= 1) {
+            alert('Por favor, insira uma Odd Lay válida maior que 1.');
+            return;
+        }
 
-                // --- LÓGICA DE CÁLCULO DEFINITIVA ---
-                const layStake = state.currentBookieValue / (layOdds - state.commission);
-                const liability = layStake * (layOdds - 1);
-                
-                const profitIfLayWins = layStake * (1 - state.commission);
-                const finalResult = profitIfLayWins - state.currentBookieValue;
-                
-                state.lastCalculatedResult = finalResult;
+        // Valor a proteger nesta perna
+        const valorProtegido = state.lucroEsperado - state.responsabilidadeAcumulada;
 
-                layStakeAction.textContent = `Ação: Faça uma Aposta Lay de R$ ${layStake.toFixed(2)}`;
-                layLiability.textContent = `Sua Responsabilidade: R$ ${liability.toFixed(2)}`;
-                
-                finalOutcomeDisplay.textContent = `R$ ${finalResult.toFixed(2)}`;
-                finalOutcomeDisplay.className = `text-2xl font-bold ${finalResult >= 0 ? 'text-green-400' : 'text-red-400'}`;
-                
-                legResults.classList.remove('hidden');
-                legOutcome.classList.remove('hidden');
-            }
+        // Calcular layStake correto:
+        const layStake = valorProtegido / (layOdds - state.comissao);
 
-            function handleLegWin() {
-                const legBackOdds = state.legs[state.currentLegIndex];
-                
-                // Atualiza o valor em jogo para o próximo cálculo
-                state.currentBookieValue = state.currentBookieValue * legBackOdds;
-                
-                state.currentLegIndex++;
+        // Responsabilidade da lay:
+        const liability = layStake * (layOdds - 1);
 
-                if (state.currentLegIndex >= state.legs.length) {
-                     showFinalResult(`Parabéns! Sua múltipla foi vitoriosa.`, `O resultado final da sua operação foi de R$ ${state.lastCalculatedResult.toFixed(2)}.`);
-                } else {
-                    updateLegUI();
-                }
-            }
+        state.layStakeAtual = layStake;
+        state.liabilityAtual = liability;
 
-            function handleLegLose() {
-                showFinalResult(`Operação Concluída!`, `O resultado final da sua operação foi de R$ ${state.lastCalculatedResult.toFixed(2)}, como planejado.`);
-            }
+        // Lucro líquido esperado se a múltipla quebrar aqui:
+        const lucroLay = layStake * (1 - state.comissao);
 
-            function showFinalResult(title, message) {
-                finalTitle.textContent = title;
-                finalMessage.textContent = message;
-                legStep.classList.add('hidden');
-                resultStep.classList.remove('hidden');
-            }
+        // O resultado garantido é o lucro líquido da lay menos o valor a proteger, deve ficar próximo de zero:
+        const resultadoGarantido = lucroLay - valorProtegido;
 
-            addLegBtn.addEventListener('click', addLeg);
-            startBtn.addEventListener('click', startCalculation);
-            layOddsInput.addEventListener('input', calculateLeg);
-            legWinBtn.addEventListener('click', handleLegWin);
-            legLoseBtn.addEventListener('click', handleLegLose);
-            resetBtn.addEventListener('click', initialize);
+        let texto = `Lay Stake: ${formatarValor(layStake)}\n`;
+        texto += `Responsabilidade: ${formatarValor(liability)}\n`;
+        texto += `Lucro garantido se a múltipla quebrar nesta perna: ${formatarValor(resultadoGarantido)}\n`;
+        texto += `Valor a proteger (lucro esperado - responsabilidades pagas): ${formatarValor(valorProtegido)}\n`;
 
-            initialize();
-        });
-    </script>
+        layInfo.textContent = texto;
+        layInfo.classList.remove('hidden');
+
+        btnContinuar.disabled = false;
+        btnEncerrar.disabled = false;
+    };
+
+    btnContinuar.onclick = () => {
+        // Múltipla venceu esta perna
+        state.valorAtual *= state.backOdds[state.atualIndex];
+        state.responsabilidadeAcumulada += state.liabilityAtual;
+
+        state.atualIndex++;
+
+        if (state.atualIndex >= state.backOdds.length) {
+            // Múltipla completa: lucro líquido = valor acumulado - stake inicial - responsabilidades pagas
+            const lucroLiquido = state.valorAtual - state.stake - state.responsabilidadeAcumulada;
+            resultadoFinalDiv.innerHTML = `
+                ✅ Múltipla completa!<br />
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Investimento Total</th>
+                            <th>Retorno Bruto da Múltipla</th>
+                            <th>Responsabilidade Acumulada (Lays)</th>
+                            <th>Lucro Líquido</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>${formatarValor(state.stake + state.responsabilidadeAcumulada)}</td>
+                            <td>${formatarValor(state.valorAtual)}</td>
+                            <td>${formatarValor(state.responsabilidadeAcumulada)}</td>
+                            <td style="color: ${lucroLiquido >= 0 ? '#22c55e' : '#ef4444'};">${formatarValor(lucroLiquido)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+            laySection.classList.add('hidden');
+        } else {
+            atualizarLayUI();
+        }
+    };
+
+    btnEncerrar.onclick = () => {
+        // Múltipla quebrou na perna atual e lay foi acionado
+
+        // Retorno na lay (dinheiro que você ganha nessa lay): layStake * (1 - comissão)
+        const retornoLay = state.layStakeAtual * (1 - state.comissao);
+
+        // Investimento total: aposta inicial + responsabilidades pagas até antes da perna atual
+        const investimentoTotal = state.stake + state.responsabilidadeAcumulada;
+
+        // Lucro líquido: retorno da lay + valor acumulado na casa - investimento total
+        // valorAtual é o valor acumulado até antes da perna que quebrou
+        const lucroLiquido = retornoLay + state.valorAtual - investimentoTotal;
+
+        resultadoFinalDiv.innerHTML = `
+            ❌ Múltipla quebrou (lay acionado).<br />
+            <table>
+                <thead>
+                    <tr>
+                        <th>Investimento Total</th>
+                        <th>Retorno na Lay + Valor Acumulado</th>
+                        <th>Lucro Líquido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>${formatarValor(investimentoTotal)}</td>
+                        <td>${formatarValor(retornoLay + state.valorAtual)}</td>
+                        <td style="color: ${lucroLiquido >= 0 ? '#22c55e' : '#ef4444'};">${formatarValor(lucroLiquido)}</td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
+
+        laySection.classList.add('hidden');
+    };
+</script>
 </body>
 </html>
