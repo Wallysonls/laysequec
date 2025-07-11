@@ -142,7 +142,6 @@
     const btnIniciar = document.getElementById('iniciar');
 
     btnIniciar.onclick = () => {
-        // Resetar estado
         state.stake = parseFloat(backStakeInput.value);
         state.comissao = parseFloat(commissionInput.value) / 100;
         state.backOdds = backOddsInput.value.split(',').map(o => parseFloat(o.trim())).filter(o => o > 1);
@@ -188,22 +187,15 @@
             return;
         }
 
-        // Valor a proteger nesta perna
         const valorProtegido = state.lucroEsperado - state.responsabilidadeAcumulada;
 
-        // Calcular layStake correto:
         const layStake = valorProtegido / (layOdds - state.comissao);
-
-        // Responsabilidade da lay:
         const liability = layStake * (layOdds - 1);
 
         state.layStakeAtual = layStake;
         state.liabilityAtual = liability;
 
-        // Lucro líquido esperado se a múltipla quebrar aqui:
         const lucroLay = layStake * (1 - state.comissao);
-
-        // O resultado garantido é o lucro líquido da lay menos o valor a proteger, deve ficar próximo de zero:
         const resultadoGarantido = lucroLay - valorProtegido;
 
         let texto = `Lay Stake: ${formatarValor(layStake)}\n`;
@@ -219,14 +211,12 @@
     };
 
     btnContinuar.onclick = () => {
-        // Múltipla venceu esta perna
         state.valorAtual *= state.backOdds[state.atualIndex];
         state.responsabilidadeAcumulada += state.liabilityAtual;
 
         state.atualIndex++;
 
         if (state.atualIndex >= state.backOdds.length) {
-            // Múltipla completa: lucro líquido = valor acumulado - stake inicial - responsabilidades pagas
             const lucroLiquido = state.valorAtual - state.stake - state.responsabilidadeAcumulada;
             resultadoFinalDiv.innerHTML = `
                 ✅ Múltipla completa!<br />
@@ -256,16 +246,11 @@
     };
 
     btnEncerrar.onclick = () => {
-        // Múltipla quebrou na perna atual e lay foi acionado
-
-        // Retorno na lay (dinheiro que você ganha nessa lay): layStake * (1 - comissão)
         const retornoLay = state.layStakeAtual * (1 - state.comissao);
 
-        // Investimento total: aposta inicial + responsabilidades pagas até antes da perna atual
-        const investimentoTotal = state.stake + state.responsabilidadeAcumulada;
+        // Inclui responsabilidadeAtual aqui no investimento total
+        const investimentoTotal = state.stake + state.responsabilidadeAcumulada + state.liabilityAtual;
 
-        // Lucro líquido: retorno da lay + valor acumulado na casa - investimento total
-        // valorAtual é o valor acumulado até antes da perna que quebrou
         const lucroLiquido = retornoLay + state.valorAtual - investimentoTotal;
 
         resultadoFinalDiv.innerHTML = `
