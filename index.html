@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Lay Sequencial (Versão Definitiva)</title>
+    <title>Calculadora de Lay Sequencial (Versão Final e Corrigida)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,9 +55,9 @@
                 <input type="number" id="layOdds" class="input-field w-full" step="0.01">
             </div>
             <div id="leg-results" class="space-y-3 pt-2 hidden">
-                <p class="text-lg font-semibold text-sky-400" id="lay-stake-action"></p>
-                <p class="text-lg font-semibold text-white" id="lay-liability"></p>
-                <div class="result-value p-3 rounded-md text-center">
+                <p id="lay-stake-action" class="text-lg font-semibold text-sky-400"></p>
+                <p id="lay-liability" class="text-lg font-semibold text-white"></p>
+                <div style="background-color: #111827; border: 1px dashed #4b5563;" class="p-3 rounded-md text-center">
                     <p class="text-sm text-gray-400">Resultado Final Garantido (Lucro / Prejuízo)</p>
                     <p id="final-outcome" class="text-2xl font-bold"></p>
                 </div>
@@ -65,8 +65,8 @@
             <div id="leg-outcome" class="pt-4 space-y-2 hidden">
                 <p class="text-center font-semibold">A seleção do Jogo <span class="current-leg-number"></span> ganhou?</p>
                 <div class="flex gap-4">
-                    <button id="leg-win-btn" class="btn btn-success w-full">SIM</button>
-                    <button id="leg-lose-btn" class="btn btn-danger w-full">NÃO</button>
+                    <button id="leg-win-btn" class="btn-success w-full">SIM</button>
+                    <button id="leg-lose-btn" class="btn-danger w-full">NÃO</button>
                 </div>
             </div>
         </div>
@@ -74,7 +74,7 @@
         <div id="result-step" class="panel rounded-lg p-6 space-y-4 hidden text-center">
              <h2 id="final-title" class="text-2xl font-bold"></h2>
              <p id="final-message" class="text-lg"></p>
-             <button id="reset-btn" class="btn btn-primary w-full mt-4">Recomeçar</button>
+             <button id="reset-btn" class="btn-primary w-full mt-4">Recomeçar</button>
         </div>
     </div>
 
@@ -103,7 +103,7 @@
             
             let state = {};
 
-            function addLeg() {
+            function addLeg(isInitial = false) {
                 const legNumber = legsContainer.children.length;
                 const legDiv = document.createElement('div');
                 legDiv.innerHTML = `<label class="block text-sm font-medium mb-1">Odd Back da Seleção ${legNumber + 1}</label><input type="number" class="leg-back-odds input-field w-full p-2" step="0.01">`;
@@ -114,10 +114,11 @@
                 state = {
                     backStake: 0,
                     commission: 0,
-                    legs: [],
+                    legs: [], // Array to hold back odds of each leg
                     currentLegIndex: 0,
-                    currentProfitIfBackWins: 0,
-                    currentProfitIfLayWins: 0,
+                    // Este valor agora representa o valor atual da aposta na casa
+                    currentBookieValue: 0, 
+                    lastCalculatedResult: 0
                 };
                 legsContainer.innerHTML = '';
                 addLeg();
@@ -138,14 +139,14 @@
                     return;
                 }
                 
-                state.currentProfitIfBackWins = state.backStake * state.legs.reduce((acc, odd) => acc * odd, 1) - state.backStake;
-                state.currentProfitIfLayWins = -state.backStake;
+                state.currentBookieValue = state.backStake;
+                state.currentLegIndex = 0;
 
                 setupStep.classList.add('hidden');
                 legStep.classList.remove('hidden');
                 updateLegUI();
             }
-            
+
             function updateLegUI() {
                 const legNumber = state.currentLegIndex + 1;
                 legTitle.textContent = `Cálculo da Perna ${legNumber} de ${state.legs.length}`;
@@ -157,21 +158,39 @@
             }
 
             function calculateLeg() {
-                const layOdds = parseFloat(layOddsInput.value);
-                if (isNaN(layOdds) || layOdds <= 1) {
+                const layOddsValue = layOddsInput.value;
+                if (layOddsValue === '' || layOddsValue === null) {
                     legResults.classList.add('hidden');
                     legOutcome.classList.add('hidden');
                     return;
                 }
+
+                const layOdds = parseFloat(layOddsValue);
+
+                // --- LÓGICA DE VALIDAÇÃO MELHORADA ---
+                if (isNaN(layOdds) || layOdds <= 1) {
+                    legResults.classList.add('hidden');
+                    legOutcome.classList.add('hidden');
+                    
+                    clearTimeout(window.layOddErrorTimeout);
+                    window.layOddErrorTimeout = setTimeout(() => {
+                        const currentVal = parseFloat(layOddsInput.value);
+                        if (currentVal <= 1 && !isNaN(currentVal)) {
+                            alert("Erro: A Odd Lay deve ser sempre maior que 1.00. Por favor, insira um valor válido (ex: 1.01 ou mais).");
+                        }
+                    }, 500);
+                    return;
+                }
                 
-                // --- LÓGICA DEFINITIVA E CORRETA ---
-                const layCommission = 1 - state.commission;
-                const layStake = (state.currentProfitIfBackWins - state.currentProfitIfLayWins) / (layOdds - state.commission);
+                clearTimeout(window.layOddErrorTimeout);
+
+                // --- LÓGICA DE CÁLCULO DEFINITIVA ---
+                const layStake = state.currentBookieValue / (layOdds - state.commission);
                 const liability = layStake * (layOdds - 1);
                 
-                // O resultado final será o mesmo em ambos os cenários
-                const finalResult = state.currentProfitIfBackWins - liability;
-
+                const profitIfLayWins = layStake * (1 - state.commission);
+                const finalResult = profitIfLayWins - state.currentBookieValue;
+                
                 state.lastCalculatedResult = finalResult;
 
                 layStakeAction.textContent = `Ação: Faça uma Aposta Lay de R$ ${layStake.toFixed(2)}`;
@@ -181,18 +200,14 @@
                 finalOutcomeDisplay.className = `text-2xl font-bold ${finalResult >= 0 ? 'text-green-400' : 'text-red-400'}`;
                 
                 legResults.classList.remove('hidden');
-                legOutcome.classList.add('hidden');
+                legOutcome.classList.remove('hidden');
             }
 
             function handleLegWin() {
                 const legBackOdds = state.legs[state.currentLegIndex];
-                const layOdds = parseFloat(layOddsInput.value);
-                const layStakeText = layStakeAction.textContent.match(/[\d\.-]+/);
-                if (!layStakeText) return;
-                const layStake = parseFloat(layStakeText[0]);
-
-                state.currentProfitIfLayWins += layStake * (layOdds - 1);
-                state.currentProfitIfBackWins = (state.currentProfitIfBackWins + state.backStake) * legBackOdds - state.backStake;
+                
+                // Atualiza o valor em jogo para o próximo cálculo
+                state.currentBookieValue = state.currentBookieValue * legBackOdds;
                 
                 state.currentLegIndex++;
 
