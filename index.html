@@ -15,6 +15,9 @@
         .btn-primary:hover { background-color: #38bdf8; }
         .btn-success { background-color: #22c55e; color: white; }
         .btn-danger { background-color: #ef4444; color: white; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { border: 1px solid #4b5563; padding: 0.5rem; text-align: center; }
+        th { background-color: #374151; }
     </style>
 </head>
 <body>
@@ -74,7 +77,7 @@ const backOddsInput = document.getElementById('backOdds');
 const layOddsInput = document.getElementById('layOdds');
 const resultadoFinalDiv = document.getElementById('resultado-final');
 
-const protegerPorcentagens = [0.3, 0.3, 0.4]; // Total 100%
+const protegerPorcentagens = [0.3, 0.3, 0.4];
 
 document.getElementById('iniciar').onclick = () => {
     state.stake = parseFloat(backStakeInput.value);
@@ -115,14 +118,17 @@ document.getElementById('calcularLay').onclick = () => {
     const protegerValor = state.lucroEsperado * state.protecoes[state.atualIndex];
     const layStake = protegerValor / (layOdds - state.comissao);
     const liability = layStake * (layOdds - 1);
-    const resultado = layStake * (1 - state.comissao) - state.valorAtual;
 
     state.layStakeAtual = layStake;
     state.layTotalResponsabilidade += liability;
 
+    const retornoLay = layStake * (1 - state.comissao);
+    const investimentoTotal = state.stake + state.layTotalResponsabilidade;
+    const lucroReal = retornoLay + state.valorAtual - investimentoTotal;
+
     document.getElementById('lay-stake').textContent = `Lay Stake: ${formatarValor(layStake)}`;
     document.getElementById('lay-liability').textContent = `Responsabilidade: ${formatarValor(liability)}`;
-    document.getElementById('lay-outcome').textContent += `\nLucro se a múltipla quebrar agora: ${formatarValor(resultado)}`;
+    document.getElementById('lay-outcome').textContent = `Seleção ${state.atualIndex + 1} de ${state.backOdds.length}. Lucro se a múltipla quebrar agora: ${formatarValor(lucroReal)}`;
 };
 
 document.getElementById('continuar').onclick = () => {
@@ -131,7 +137,23 @@ document.getElementById('continuar').onclick = () => {
 
     if (state.atualIndex >= state.backOdds.length) {
         const lucroFinal = state.valorAtual - state.stake - state.layTotalResponsabilidade;
-        resultadoFinalDiv.textContent = `✅ Múltipla completa! Lucro final: ${formatarValor(lucroFinal)}`;
+        resultadoFinalDiv.innerHTML = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Investimento Total</th>
+                        <th>Retorno Bruto</th>
+                        <th>Lucro Líquido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>${formatarValor(state.stake + state.layTotalResponsabilidade)}</td>
+                        <td>${formatarValor(state.valorAtual)}</td>
+                        <td style="color: ${lucroFinal >= 0 ? '#22c55e' : '#ef4444'};">${formatarValor(lucroFinal)}</td>
+                    </tr>
+                </tbody>
+            </table>`;
         document.getElementById('lay-section').classList.add('hidden');
     } else {
         updateLayUI();
@@ -142,7 +164,25 @@ document.getElementById('encerrar').onclick = () => {
     const retornoLay = state.layStakeAtual * (1 - state.comissao);
     const investimentoTotal = state.stake + state.layTotalResponsabilidade;
     const lucroLiquido = retornoLay + state.valorAtual - investimentoTotal;
-    resultadoFinalDiv.textContent = `❌ Múltipla protegida. Lucro líquido: ${formatarValor(lucroLiquido)}`;
+
+    resultadoFinalDiv.innerHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Investimento Total</th>
+                    <th>Retorno na Lay + Acumulado</th>
+                    <th>Lucro Líquido</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>${formatarValor(investimentoTotal)}</td>
+                    <td>${formatarValor(retornoLay + state.valorAtual)}</td>
+                    <td style="color: ${lucroLiquido >= 0 ? '#22c55e' : '#ef4444'};">${formatarValor(lucroLiquido)}</td>
+                </tr>
+            </tbody>
+        </table>`;
+
     document.getElementById('lay-section').classList.add('hidden');
 };
 </script>
