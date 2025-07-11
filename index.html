@@ -5,55 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Lay Sequencial PRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; background-color: #111827; color: #d1d5db; }
-        .panel { background-color: #1f2937; border: 1px solid #374151; }
-        .input-field { background-color: #374151; border: 1px solid #4b5563; color: white; }
-        .input-field:focus { outline: none; border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3); }
-        .btn { transition: background-color 0.2s; border-radius: 0.375rem; padding: 0.75rem 0; font-weight: 700; }
-        .btn-primary { background-color: #0ea5e9; color: white; }
-        .btn-primary:hover { background-color: #38bdf8; }
-        .btn-success { background-color: #22c55e; color: white; }
-        .btn-danger { background-color: #ef4444; color: white; }
-        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        th, td { border: 1px solid #4b5563; padding: 0.5rem; text-align: center; }
-        th { background-color: #374151; }
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+        .panel {
+            background-color: rgba(31, 41, 55, 0.7); /* bg-gray-800 com transparência */
+            border: 1px solid #374151;
+            @apply p-6 rounded-xl shadow-lg;
+        }
+        .input-field {
+            background-color: #374151; /* bg-gray-700 */
+            border: 1px solid #4b5563; /* border-gray-600 */
+            color: white;
+            @apply w-full rounded-md p-2;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #fb923c; /* Laranja para foco */
+            box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.3);
+        }
+        .btn {
+            transition: background-color 0.2s, transform 0.1s;
+            @apply w-full font-bold py-3 mt-4 rounded-md;
+        }
+        .btn-primary {
+            background-color: #f97316; /* Laranja */
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #fb923c;
+        }
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        .btn-success {
+            background-color: #22c55e; /* Verde */
+            color: white;
+        }
+        .btn-danger {
+            background-color: #ef4444; /* Vermelho */
+            color: white;
+        }
+        .title-main {
+            @apply text-orange-400 mb-8 text-center;
+            font-size: 0.7cm;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(251, 146, 60, 0.5), 0 0 35px rgba(251, 146, 60, 0.3);
+        }
+        .title-section {
+            @apply text-xl text-sky-400 mb-4;
+            font-weight: 700 !important;
+        }
+        .result-value {
+            background-color: #111827;
+            border: 1px dashed #4b5563;
+        }
     </style>
 </head>
-<body>
+<body class="bg-gradient-to-b from-slate-900 to-black text-gray-300 min-h-screen">
 <div class="container mx-auto p-4 max-w-2xl">
-    <h1 class="text-3xl font-bold text-sky-400 mb-4 text-center">Calculadora de Lay Sequencial PRO</h1>
+    <h1 class="title-main">Lay Sequencial PRO</h1>
 
     <div class="panel p-4 rounded space-y-4">
+        <h2 class="title-section">Configuração Inicial</h2>
         <div>
-            <label>Aposta Inicial (R$)</label>
-            <input type="number" id="backStake" class="input-field w-full" value="50" step="0.01">
+            <label class="block text-sm mb-1">Aposta Inicial (R$)</label>
+            <input type="number" id="backStake" class="input-field" value="50" step="0.01">
         </div>
         <div>
-            <label>Comissão da Bolsa (%)</label>
-            <input type="number" id="commission" class="input-field w-full" value="6.5" step="0.1">
+            <label class="block text-sm mb-1">Comissão da Bolsa (%)</label>
+            <input type="number" id="commission" class="input-field" value="6.5" step="0.1">
         </div>
         <div>
-            <label>Odds Back das Seleções (separadas por vírgula)</label>
-            <input type="text" id="backOdds" class="input-field w-full" placeholder="Ex: 1.80, 1.65, 1.90">
+            <label class="block text-sm mb-1">Odds Back das Seleções (separadas por vírgula)</label>
+            <input type="text" id="backOdds" class="input-field" placeholder="Ex: 1.80, 1.65, 1.90">
         </div>
-        <div id="lay-section" class="hidden space-y-4">
-            <label>Odd Lay da Seleção Atual</label>
-            <input type="number" id="layOdds" class="input-field w-full" step="0.01">
-            <button class="btn-primary w-full" id="calcularLay">Calcular Lay</button>
-            <div class="text-center">
-                <p id="lay-stake"></p>
-                <p id="lay-liability"></p>
-                <p id="lay-outcome"></p>
-                <div class="flex justify-center gap-4 mt-2">
-                    <button class="btn-success" id="continuar">Próxima Seleção</button>
-                    <button class="btn-danger" id="encerrar">Encerrar Lay</button>
-                </div>
+        <button class="btn btn-primary" id="iniciar">Iniciar Cálculo</button>
+    </div>
+
+    <div id="lay-section" class="panel p-4 rounded space-y-4 mt-6 hidden">
+        <h2 id="lay-outcome" class="title-section"></h2>
+        <label class="block text-sm mb-1">Odd Lay da Seleção Atual</label>
+        <input type="number" id="layOdds" class="input-field" step="0.01">
+        <button class="btn btn-primary" id="calcularLay">Calcular Lay</button>
+        
+        <div class="text-center mt-4 space-y-2">
+            <p id="lay-stake" class="text-lg"></p>
+            <p id="lay-liability" class="text-lg"></p>
+            <div class="flex justify-center gap-4 mt-2">
+                <button class="btn btn-success w-1/2" id="continuar">Próxima Seleção</button>
+                <button class="btn btn-danger w-1/2" id="encerrar">Encerrar Lay</button>
             </div>
         </div>
-        <button class="btn-primary w-full" id="iniciar">Iniciar Cálculo</button>
-        <div id="resultado-final" class="text-center mt-4 font-bold"></div>
     </div>
+
+    <div id="resultado-final" class="panel p-4 rounded mt-6 text-center font-bold hidden"></div>
 </div>
 
 <script>
@@ -106,6 +156,7 @@ function updateLayUI() {
     document.getElementById('lay-outcome').textContent = `Seleção ${state.atualIndex + 1} de ${state.backOdds.length}`;
     layOddsInput.value = '';
     resultadoFinalDiv.textContent = '';
+    resultadoFinalDiv.classList.add('hidden');
 }
 
 document.getElementById('calcularLay').onclick = () => {
@@ -120,25 +171,20 @@ document.getElementById('calcularLay').onclick = () => {
     const liability = layStake * (layOdds - 1);
 
     state.layStakeAtual = layStake;
-    state.layTotalResponsabilidade += liability;
-
-    const retornoLay = layStake * (1 - state.comissao);
-    const investimentoTotal = state.stake + state.layTotalResponsabilidade;
-    const lucroReal = retornoLay + state.valorAtual - investimentoTotal;
-
+    
     document.getElementById('lay-stake').textContent = `Lay Stake: ${formatarValor(layStake)}`;
     document.getElementById('lay-liability').textContent = `Responsabilidade: ${formatarValor(liability)}`;
-    document.getElementById('lay-outcome').textContent = `Seleção ${state.atualIndex + 1} de ${state.backOdds.length}. Lucro se a múltipla quebrar agora: ${formatarValor(lucroReal)}`;
 };
 
 document.getElementById('continuar').onclick = () => {
+    state.layTotalResponsabilidade += state.layStakeAtual * (parseFloat(layOddsInput.value) - 1);
     state.valorAtual *= state.backOdds[state.atualIndex];
     state.atualIndex++;
 
     if (state.atualIndex >= state.backOdds.length) {
         const lucroFinal = state.valorAtual - state.stake - state.layTotalResponsabilidade;
         resultadoFinalDiv.innerHTML = `
-            <table>
+            <table class="w-full">
                 <thead>
                     <tr>
                         <th>Investimento Total</th>
@@ -155,6 +201,7 @@ document.getElementById('continuar').onclick = () => {
                 </tbody>
             </table>`;
         document.getElementById('lay-section').classList.add('hidden');
+        resultadoFinalDiv.classList.remove('hidden');
     } else {
         updateLayUI();
     }
@@ -162,7 +209,7 @@ document.getElementById('continuar').onclick = () => {
 
 document.getElementById('encerrar').onclick = () => {
     const retornoLay = state.layStakeAtual * (1 - state.comissao);
-    const investimentoTotal = state.stake + state.layTotalResponsabilidade;
+    const investimentoTotal = state.stake + state.layTotalResponsabilidade + (state.layStakeAtual * (parseFloat(layOddsInput.value) - 1));
     const lucroLiquido = retornoLay + state.valorAtual - investimentoTotal;
 
     resultadoFinalDiv.innerHTML = `
@@ -184,6 +231,7 @@ document.getElementById('encerrar').onclick = () => {
         </table>`;
 
     document.getElementById('lay-section').classList.add('hidden');
+    resultadoFinalDiv.classList.remove('hidden');
 };
 </script>
 </body>
