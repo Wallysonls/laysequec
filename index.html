@@ -263,6 +263,7 @@
 
         switch (mode) {
           case 'standard':
+            // Lay stake para garantir lucro equilibrado considerando comissão corretamente:
             layStake = (potentialReturn - accLiability) / (layOdds - 1);
             liability = layStake * (layOdds - 1);
             const lucroLay = layStake * (1 - commission);
@@ -271,6 +272,7 @@
 
           case 'lockin':
             const lucroBack = (backOdds - 1) * backStake;
+            // Lay stake para travar lucro final, considerando comissão no lucro do lay:
             layStake = (backStake + accLiability + lucroBack) / (layOdds - 1);
             liability = layStake * (layOdds - 1);
             resultadoFinal = lucroBack - liability - accLiability;
